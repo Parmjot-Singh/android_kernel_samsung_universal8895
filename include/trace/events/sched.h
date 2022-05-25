@@ -8,6 +8,27 @@
 #include <linux/tracepoint.h>
 #include <linux/binfmts.h>
 
+struct rt_rq;
+
+TRACE_EVENT(sched_rt_load_avg_cpu,
+
+	TP_PROTO(int cpu, struct rt_rq *rt_rq),
+
+	TP_ARGS(cpu, rt_rq),
+
+	TP_STRUCT__entry(
+		__field( int,		cpu	)
+		__field( unsigned long,	util_avg)
+	),
+
+	TP_fast_assign(
+		__entry->cpu = cpu;
+		__entry->util_avg = rt_rq->avg.util_avg;
+	),
+
+	TP_printk("cpu=%d util_avg=%lu ", __entry->cpu, __entry->util_avg)
+);
+
 /*
  * Tracepoint for calling kthread_stop, performed to end a kthread:
  */
@@ -895,25 +916,6 @@ TRACE_EVENT(sched_rt_load_avg_task,
 		__entry->util_avg,
 		(u32)__entry->util_sum,
 		(u32)__entry->period_contrib)
-);
-
-TRACE_EVENT(sched_rt_load_avg_cpu,
-
-	TP_PROTO(int cpu, struct rt_rq *rt_rq),
-
-	TP_ARGS(cpu, rt_rq),
-
-	TP_STRUCT__entry(
-		__field( int,		cpu	)
-		__field( unsigned long,	util_avg)
-	),
-
-	TP_fast_assign(
-		__entry->cpu = cpu;
-		__entry->util_avg = rt_rq->avg.util_avg;
-	),
-
-	TP_printk("cpu=%d util_avg=%lu ", __entry->cpu, __entry->util_avg)
 );
 
 #ifdef CONFIG_SCHED_USE_FLUID_RT
