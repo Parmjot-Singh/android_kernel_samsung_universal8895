@@ -46,10 +46,10 @@ struct aa_task_ctx *aa_alloc_task_context(gfp_t flags)
  */
 void aa_free_task_context(struct aa_task_ctx *ctx)
 {
-	if (cxt) {
-		aa_put_profile(cxt->profile);
-		aa_put_profile(cxt->previous);
-		aa_put_profile(cxt->onexec);
+	if (ctx) {
+		aa_put_label(ctx->label);
+		aa_put_label(ctx->previous);
+		aa_put_label(ctx->onexec);
 
 		kzfree(ctx);
 	}
@@ -147,7 +147,7 @@ int aa_set_current_onexec(struct aa_label *label, bool stack)
 
 /**
  * aa_set_current_hat - set the current tasks hat
- * @label: label to set as the current hat (NOT NULL)
+ * @label: label to set as the current hat  (NOT NULL)
  * @token: token value that must be specified to change from the hat
  *
  * Do switch of tasks hat.  If the task is currently in a hat
@@ -188,7 +188,7 @@ int aa_set_current_hat(struct aa_label *label, u64 token)
  * aa_restore_previous_label - exit from hat context restoring previous label
  * @token: the token that must be matched to exit hat context
  *
- * Attempt to return out of a hat to the previous label. The token
+ * Attempt to return out of a hat to the previous label.  The token
  * must match the stored token value.
  *
  * Returns: 0 or error of failure
@@ -205,8 +205,8 @@ int aa_restore_previous_label(u64 token)
 		abort_creds(new);
 		return -EACCES;
 	}
-	/* ignore restores when there is no saved profile */
-	if (!cxt->previous) {
+	/* ignore restores when there is no saved label */
+	if (!ctx->previous) {
 		abort_creds(new);
 		return 0;
 	}
